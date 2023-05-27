@@ -1,0 +1,31 @@
+
+header {
+    background-color: hsl(240, 100%, 50%, 0.7);
+    
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 70px
+    
+}
+
+input {
+    display: flex;
+    width: 200px;
+    height: 30px;
+    margin: 0;
+    padding: 0 10px 0 10px;
+
+      
+}
+
+button {
+    width: 50px;
+    height: 34px;
+    margin: 0;
+    padding: 0;
+}
+
