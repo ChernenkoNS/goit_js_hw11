@@ -15,6 +15,10 @@ const ref = {
 
 let page = 1;
 let inputValue = '';
+
+let totalItem = 0;
+let totalHits = 0;
+
 ref.form.addEventListener('submit', onSubmit);
 
 async function onSubmit(event) {
@@ -23,19 +27,24 @@ async function onSubmit(event) {
 
   page = 1;
   if (event.currentTarget.searchQuery.value.length === 0) {
-    Notiflix.Notify.failure('Memento te hominem esse');
+    Notiflix.Notify.failure('Please enter your request');
     return;
   } else {
     const query = event.currentTarget.searchQuery.value;
     inputValue = query;
     const list = await getList(query, page);
-    Notiflix.Notify.info(`Hooray! We found ${list.data.totalHits} images`);
+    totalHits = list.data.totalHits;
+    if (totalItem > 0) {
+      Notiflix.Notify.info(`Hooray! We found ${totalHits} images`);
+    }
   }
 }
 
 async function getList(query, page) {
   const imgList = await API.getImages(query, page);
   const item = imgList.data.hits;
+  totalItem = totalItem + item.length;
+
   const markup = item.reduce(
     (markup, result) => markup + createMarkup(result),
     ' '
@@ -51,7 +60,7 @@ async function getList(query, page) {
   return imgList;
 }
 
-function updateList(markup) {
+async function updateList(markup) {
   ref.gallery.insertAdjacentHTML('beforeend', markup);
 
   const { height: cardHeight } = document
@@ -61,8 +70,11 @@ function updateList(markup) {
     top: cardHeight * 2,
     behavior: 'smooth',
   });
+
   page++;
+
   lightbox.refresh();
+
   const lastList = document.querySelector('.photo-card:last-child');
   if (lastList) {
     infiniteObserver.observe(lastList);
@@ -100,8 +112,13 @@ function createMarkup(item) {
 const infiniteObserver = new IntersectionObserver(([entry], observer) => {
   if (entry.isIntersecting) {
     observer.unobserve(entry.target);
-
-    getList(inputValue, page);
+    if (totalItem < totalHits) {
+      getList(inputValue, page);
+    } else {
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
   }
 });
 
