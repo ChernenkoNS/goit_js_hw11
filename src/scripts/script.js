@@ -13,7 +13,7 @@ const ref = {
   loadMoreButton: document.querySelector('.load-more'),
 };
 
-let page = 1;
+let page = 0;
 let inputValue = '';
 
 let totalItem = 0;
@@ -24,7 +24,7 @@ ref.form.addEventListener('submit', onSubmit);
 async function onSubmit(event) {
   event.preventDefault();
   clearList();
-
+  totalItem = 0
   page = 1;
   if (event.currentTarget.searchQuery.value.length === 0) {
     Notiflix.Notify.failure('Please enter your request');
@@ -110,6 +110,7 @@ function createMarkup(item) {
 }
 
 const infiniteObserver = new IntersectionObserver(([entry], observer) => {
+
   if (entry.isIntersecting) {
     observer.unobserve(entry.target);
     if (totalItem < totalHits) {
